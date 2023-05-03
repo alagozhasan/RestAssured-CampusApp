@@ -14,7 +14,6 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 public class US12_MerveA {
-    Faker faker=new Faker();
 
     String nationalityName;
 

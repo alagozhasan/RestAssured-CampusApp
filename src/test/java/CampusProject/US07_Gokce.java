@@ -13,26 +13,26 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
+
 public class US07_Gokce {
 
     RequestSpecification reqSpec;
-    Faker faker=new Faker();
-
+    Faker faker = new Faker();
     String locationName;
-
-    Map<String, String> locations=new HashMap<>();
+    Map<String, String> locations = new HashMap<>();
     String locationID;
+
     @BeforeClass
-    public void Login(){
+    public void Login() {
 
-        baseURI="https://test.mersys.io";
+        baseURI = "https://test.mersys.io";
 
-        Map<String, String> userCredential=new HashMap<>();
+        Map<String, String> userCredential = new HashMap<>();
         userCredential.put("username", "turkeyts");
         userCredential.put("password", "TechnoStudy123");
         userCredential.put("rememberMe", "true");
 
-        Cookies cookies=
+        Cookies cookies =
                 given()
 
                         .contentType(ContentType.JSON)
@@ -43,10 +43,9 @@ public class US07_Gokce {
 
                         .then()
                         .statusCode(200)
-                        .extract().response().getDetailedCookies()
-                ;
+                        .extract().response().getDetailedCookies();
 
-        reqSpec=new RequestSpecBuilder()
+        reqSpec = new RequestSpecBuilder()
                 .setContentType(ContentType.JSON)
                 .addCookies(cookies)
                 .build()
@@ -54,37 +53,35 @@ public class US07_Gokce {
     }
 
     @Test
-    public void createLocation(){
+    public void createLocation() {
 
-        locationName =faker.address().cityName()+faker.number().digits(2);
+        locationName = faker.address().cityName() + faker.number().digits(2);
         locations.put("name", locationName);
-        locations.put("shortName",faker.funnyName().name());
+        locations.put("shortName", faker.funnyName().name());
         locations.put("type", "CLASS");
         locations.put("capacity", faker.number().digits(2));
         locations.put("school", "6390f3207a3bcb6a7ac977f9");
 
-        locationID=
-        given()
-                .spec(reqSpec)
-                .body(locations)
-                .log().body()
+        locationID =
+                given()
+                        .spec(reqSpec)
+                        .body(locations)
+                        .log().body()
 
-                .when()
-                .post("/school-service/api/location")
+                        .when()
+                        .post("/school-service/api/location")
 
-                .then()
-                .log().body()
-                .statusCode(201)
-                .extract().path("id")
-
-                ;
-
-        System.out.println("locationID = " + locationID);
+                        .then()
+                        .log().body()
+                        .statusCode(201)
+                        .extract().path("id")
+        ;
     }
-    @Test (dependsOnMethods = "createLocation")
-    public void createLocationNeg(){
+
+    @Test(dependsOnMethods = "createLocation")
+    public void createLocationNeg() {
         locations.put("name", locationName);
-        locations.put("shortName",faker.funnyName().name());
+        locations.put("shortName", faker.funnyName().name());
         locations.put("type", "CLASS");
         locations.put("capacity", faker.number().digits(2));
         locations.put("school", "6390f3207a3bcb6a7ac977f9");
@@ -100,14 +97,14 @@ public class US07_Gokce {
                 .then()
                 .log().body()
                 .statusCode(400)
-
         ;
     }
-    @Test (dependsOnMethods = "createLocation")
-    public void updateLocation(){
+
+    @Test(dependsOnMethods = "createLocation")
+    public void updateLocation() {
 
         locations.put("id", locationID);
-        locationName="Gökçe"+faker.number().digits(4);
+        locationName = "Gökçe" + faker.number().digits(4);
         locations.put("name", locationName);
 
         given()
@@ -123,13 +120,11 @@ public class US07_Gokce {
                 .statusCode(200)
                 .body("name", equalTo(locationName))
         ;
-
     }
 
 
-
     @Test(dependsOnMethods = "updateLocation")
-    public void deleteLocation(){
+    public void deleteLocation() {
 
         given()
 
@@ -144,13 +139,12 @@ public class US07_Gokce {
                 .then()
                 .log().body()
                 .statusCode(200)
-                ;
+        ;
     }
 
 
-
-    @Test (dependsOnMethods = "deleteLocation" )
-    public void deleteLocationNeg(){
+    @Test(dependsOnMethods = "deleteLocation")
+    public void deleteLocationNeg() {
 
         given()
 
@@ -166,9 +160,5 @@ public class US07_Gokce {
                 .statusCode(400)
                 .body("message", equalTo("School Location not found"))
         ;
-
-
     }
-
-
 }
